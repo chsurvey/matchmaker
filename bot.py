@@ -1,5 +1,4 @@
 import discord
-import pandas as pd
 import openpyxl
 
 def isCodeRight(input_s):
