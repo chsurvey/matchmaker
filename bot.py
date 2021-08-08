@@ -1,5 +1,6 @@
 import discord
 import openpyxl
+import os
 
 def isCodeRight(input_s):
     n_count = 0
@@ -11,7 +12,6 @@ def isCodeRight(input_s):
             n_count+=1
     return True if n_count + e_count == 5 else False
 
-token='ODYzNzY1MjIyNzA2OTA1MDk5.YOrqDQ.o3-iv0gSdQ4eNJtdDxA7Cr6xa7M'
 admin_id=283788425264365569
 
 client = discord.Client()
@@ -190,4 +190,5 @@ async def on_message(message):
             file_location = "data.csv" # Set the string to where you want the file to be saved to
             data.to_csv(file_location)
         '''
-client.run(token)
+access_token=os.environ["BOT_TOKEN"]
+client.run(access_token)
