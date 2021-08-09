@@ -86,7 +86,9 @@ async def on_message(message):
                 # sheet[E(n)] = user name
 
                 if(max_row==0):
-                    await channel.send("방이 없습니다!")
+                    await message.channel.send("방이 없습니다!")
+                    return
+                
                 for idx in range(1,max_row+1):
                     
                     host = sheet["A"+str(idx)].value
@@ -98,8 +100,9 @@ async def on_message(message):
                     embed.add_field(name="Host", value=host+"("+usr_name+")", inline=False)
                     embed.add_field(name="Room Code", value=code, inline=True)
                     embed.add_field(name="Password", value=pw, inline=True)
-                      
+                    
                     await channel.send(embed=embed)
+                    await message.channel.send("<@!"+str(message.author.id)+">DM")
                 
                 file.save("room.xlsx")
 
