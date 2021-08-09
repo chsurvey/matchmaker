@@ -33,7 +33,30 @@ async def on_message(message):
 
         if len(message.content.split()) > 1:
             parameters = message.content.split()[1:]
-        
+
+        # if cmd == 'dm':
+        #     user = await client.fetch_user(int(parameters[0]))
+        #     await user.create_dm()
+        #     channel = user.dm_channel
+        #     await channel.send("test")
+        if cmd == 'mm':
+            file = openpyxl.load_workbook("mmlist.xlsx")
+            sheet = file.active
+            max_row = sheet.max_row
+            if(sheet["A1"].value==None):
+                max_row = 0
+            
+            for idx in range(1,max_row+1):
+                if sheet["A"+str(idx)].value == str(message.author.id):
+                    sheet.delete_rows(idx)
+                    await message.channel.send("mathcmaker에서 제거되었습니다.")
+                    file.save("mmlist.xlsx")
+                    return
+
+            sheet["A"+str(max_row+1)].value = str(message.author.id)
+            await message.channel.send("matchmaker에 등록되었습니다.")
+            file.save("mmlist.xlsx")
+
         if cmd == '도움':
             embed=discord.Embed(title="도움말", color=0x602dd9)
             embed.add_field(name="-방 생성", value="방을 생성합니다", inline=True)
@@ -86,9 +109,7 @@ async def on_message(message):
                 # sheet[E(n)] = user name
 
                 if(max_row==0):
-                    await message.channel.send("방이 없습니다!")
-                    return
-                
+                    await channel.send("방이 없습니다!")
                 for idx in range(1,max_row+1):
                     
                     host = sheet["A"+str(idx)].value
@@ -100,13 +121,10 @@ async def on_message(message):
                     embed.add_field(name="Host", value=host+"("+usr_name+")", inline=False)
                     embed.add_field(name="Room Code", value=code, inline=True)
                     embed.add_field(name="Password", value=pw, inline=True)
-                    
+                      
                     await channel.send(embed=embed)
-                    if message.channel.type is not discord.ChannelType.private:
-                        await message.channel.send("<@!"+str(message.author.id)+">DM")
                 
                 file.save("room.xlsx")
-
 
 
             if parameters[0] == '생성':
@@ -164,10 +182,23 @@ async def on_message(message):
 
                         file.save("room.xlsx")
                         await message.channel.send("방 등록이 완료됐습니다")
+                        
+                        file = openpyxl.load_workbook("mmlist.xlsx")
+                        sheet = file.active
+                        max_row = sheet.max_row
+                        if(sheet["A1"].value==None):
+                            return
+                        
+                        for idx in range(1,max_row+1):
+                            user = await client.fetch_user(int(sheet["A"+str(idx)].value))
+                            await user.create_dm()
+                            channel = user.dm_channel
+                            await channel.send(parameters[1]+"님의 방이 생성되었습니다. -조회")
+
+                        
 
             if parameters[0] == '수정':
                 pass
-
         '''
         # download image in current channel 
         if cmd == 'scan':
