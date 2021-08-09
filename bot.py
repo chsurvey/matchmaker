@@ -45,24 +45,44 @@ async def on_message(message):
             max_row = sheet.max_row
             if(sheet["A1"].value==None):
                 max_row = 0
-            
-            for idx in range(1,max_row+1):
-                if sheet["A"+str(idx)].value == str(message.author.id):
-                    sheet.delete_rows(idx)
-                    await message.channel.send("mathcmaker에서 제거되었습니다.")
+            try:
+                parameters
+                if message.author.id==admin_id:
+                    user = await client.fetch_user(int(parameters[0]))
+                    name=user.name
+                    for idx in range(1,max_row+1):
+                        if sheet["A"+str(idx)].value == str(parameters[0]):
+                            sheet.delete_rows(idx)
+                            await message.channel.send(name+"님이 mathcmaker에서 제거되었습니다.")
+                            file.save("mmlist.xlsx")
+                            return
+
+                    sheet["A"+str(max_row+1)].value = str(parameters[0])
+                    await message.channel.send(name+"님이 matchmaker에 등록되었습니다.")
                     file.save("mmlist.xlsx")
                     return
 
-            sheet["A"+str(max_row+1)].value = str(message.author.id)
-            await message.channel.send("matchmaker에 등록되었습니다.")
-            file.save("mmlist.xlsx")
+                else:
+                    await message.channel.send("권한이 없습니다.")
+                    return
+                    
+            except:
+                for idx in range(1,max_row+1):
+                    if sheet["A"+str(idx)].value == str(message.author.id):
+                        sheet.delete_rows(idx)
+                        await message.channel.send("mathcmaker에서 제거되었습니다.")
+                        file.save("mmlist.xlsx")
+                        return
+
+                sheet["A"+str(max_row+1)].value = str(message.author.id)
+                await message.channel.send("matchmaker에 등록되었습니다.")
+                file.save("mmlist.xlsx")
 
         if cmd == '도움':
             embed=discord.Embed(title="도움말", color=0x602dd9)
             embed.add_field(name="-방 생성", value="방을 생성합니다", inline=True)
             embed.add_field(name="-방 삭제", value="방을 삭제합니다", inline=True)
             embed.add_field(name="-방 조회", value="현재 있는 방을 나열합니다", inline=True)
-            embed.add_field(name="-mm", value="matchmaker를 등록/제거합니다. 방 생성 여부를 dm으로 알려줍니다.", inline=True)
             await message.channel.send(embed=embed)
 
         if cmd == '방':            
@@ -96,7 +116,9 @@ async def on_message(message):
                 file = openpyxl.load_workbook("room.xlsx")
                 sheet = file.active
                 max_row = sheet.max_row
-                channel = message.channel
+                user = message.author
+                await user.create_dm()
+                channel = user.dm_channel
 
                 #print(max_row)
                 if(sheet["A1"].value==None):
@@ -193,42 +215,6 @@ async def on_message(message):
                             await user.create_dm()
                             channel = user.dm_channel
                             await channel.send(parameters[1]+"님의 방이 생성되었습니다. -조회")
-
-                        
-
-            if parameters[0] == '수정':
-                pass
-        '''
-        # download image in current channel 
-        if cmd == 'scan':
-            print("got scan")
-            data = pd.DataFrame(columns=['content', 'time', 'author'])
-            
-            def is_command (msg): # Checking if the message is a command call
-                if len(msg.content) == 0:
-                    return False
-                elif msg.content.split()[0] == '_scan':
-                    return True
-                else:
-                    return False
-            cnt=0
-            async for msg in message.channel.history(limit=None): # As an example, I've set the limit to 10000
-                if msg.author != client.user:                        # meaning it'll read 10000 messages instead of           
-                                                                      # the default amount of 100        
-                    for attachment in msg.attachments:
-                        await attachment.save(fp=str(cnt)+".png")
-                        cnt+=1
-                        print('att',attachment)
-                        
-                    data = data.append({'content': msg.content,
-                                        'time': msg.created_at,
-                                        'author': msg.author.name}, ignore_index=True)
-                                            
-                    if len(data) == 10000:
-                        break
-                
-            file_location = "data.csv" # Set the string to where you want the file to be saved to
-            data.to_csv(file_location)
-        '''
+                            
 access_token=os.environ["BOT_TOKEN"]
 client.run(access_token)
