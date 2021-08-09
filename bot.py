@@ -62,7 +62,7 @@ async def on_message(message):
             embed.add_field(name="-방 생성", value="방을 생성합니다", inline=True)
             embed.add_field(name="-방 삭제", value="방을 삭제합니다", inline=True)
             embed.add_field(name="-방 조회", value="현재 있는 방을 나열합니다", inline=True)
-            embed.add_field(name="mm", value="matchmaker를 등록/제거합니다. 방 생성 여부를 dm으로 알려줍니다.", inline=True)
+            embed.add_field(name="-mm", value="matchmaker를 등록/제거합니다. 방 생성 여부를 dm으로 알려줍니다.", inline=True)
             await message.channel.send(embed=embed)
 
         if cmd == '방':            
