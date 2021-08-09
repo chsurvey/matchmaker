@@ -68,9 +68,14 @@ async def on_message(message):
                     file.save("room.xlsx")
 
             if parameters[0] == '조회':
+                
                 file = openpyxl.load_workbook("room.xlsx")
                 sheet = file.active
                 max_row = sheet.max_row
+                user = message.author
+                await user.create_dm()
+                channel = user.dm_channel
+
                 #print(max_row)
                 if(sheet["A1"].value==None):
                     max_row = 0
@@ -81,7 +86,7 @@ async def on_message(message):
                 # sheet[E(n)] = user name
 
                 if(max_row==0):
-                    await message.channel.send("방이 없습니다!")
+                    await channel.send("방이 없습니다!")
                 for idx in range(1,max_row+1):
                     
                     host = sheet["A"+str(idx)].value
@@ -93,10 +98,11 @@ async def on_message(message):
                     embed.add_field(name="Host", value=host+"("+usr_name+")", inline=False)
                     embed.add_field(name="Room Code", value=code, inline=True)
                     embed.add_field(name="Password", value=pw, inline=True)
-                    
-                    await message.channel.send(embed=embed)
+                      
+                    await channel.send(embed=embed)
                 
                 file.save("room.xlsx")
+
 
 
             if parameters[0] == '생성':
