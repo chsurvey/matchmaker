@@ -116,9 +116,7 @@ async def on_message(message):
                 file = openpyxl.load_workbook("room.xlsx")
                 sheet = file.active
                 max_row = sheet.max_row
-                user = message.author
-                await user.create_dm()
-                channel = user.dm_channel
+                channel = message.channel
 
                 #print(max_row)
                 if(sheet["A1"].value==None):
