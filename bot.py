@@ -46,7 +46,7 @@ async def on_message(message):
             if(sheet["A1"].value==None):
                 max_row = 0
             try:
-                parameters
+                print(parameters)
                 if message.author.id==admin_id:
                     user = await client.fetch_user(int(parameters[0]))
                     name=user.name
