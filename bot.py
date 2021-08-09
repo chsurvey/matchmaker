@@ -102,7 +102,8 @@ async def on_message(message):
                     embed.add_field(name="Password", value=pw, inline=True)
                     
                     await channel.send(embed=embed)
-                    await message.channel.send("<@!"+str(message.author.id)+">DM")
+                    if message.channel.type is not discord.ChannelType.private:
+                        await message.channel.send("<@!"+str(message.author.id)+">DM")
                 
                 file.save("room.xlsx")
 
