@@ -1,6 +1,5 @@
 import discord
-import openpyxl
-import datetime
+import os
 
 def isCodeRight(input_s):
     n_count = 0
@@ -12,12 +11,10 @@ def isCodeRight(input_s):
             n_count+=1
     return True if n_count + e_count == 5 else False
 
-token='ODYzNzY1MjIyNzA2OTA1MDk5.YOrqDQ.k8Hz-rg-ijxmpMS69wjaeOKi_dQ'
+
 admin_id=283788425264365569
 mmlist=875722259363422248
 room=875722229726449685
-
-now = datetime.datetime.now
 
 client = discord.Client()
 guild = discord.Guild
@@ -200,5 +197,5 @@ async def on_message(message):
                             tmpchannel = user.dm_channel
                             await tmpchannel.send(parameters[1]+"님의 방이 생성되었습니다. -방 조회")
 
-
-client.run(token)
+access_token=os.environ["BOT_TOKEN"]
+client.run(access_token)
