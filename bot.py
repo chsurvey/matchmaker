@@ -11,10 +11,9 @@ def isCodeRight(input_s):
             n_count+=1
     return True if n_count + e_count == 5 else False
 
-
-admin_id=283788425264365569
-mmlist=875722259363422248
-room=875722229726449685
+access_token=os.environ["ADMIN_ID"]
+access_token=os.environ["MMLIST"]
+access_token=os.environ["ROOM"]
 
 client = discord.Client()
 guild = discord.Guild
