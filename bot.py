@@ -1,6 +1,6 @@
 import discord
 import openpyxl
-import os
+import datetime
 
 def isCodeRight(input_s):
     n_count = 0
@@ -12,7 +12,12 @@ def isCodeRight(input_s):
             n_count+=1
     return True if n_count + e_count == 5 else False
 
+token='ODYzNzY1MjIyNzA2OTA1MDk5.YOrqDQ.k8Hz-rg-ijxmpMS69wjaeOKi_dQ'
 admin_id=283788425264365569
+mmlist=875722259363422248
+room=875722229726449685
+
+now = datetime.datetime.now
 
 client = discord.Client()
 guild = discord.Guild
@@ -40,26 +45,22 @@ async def on_message(message):
         #     channel = user.dm_channel
         #     await channel.send("test")
         if cmd == 'mm':
-            file = openpyxl.load_workbook("mmlist.xlsx")
-            sheet = file.active
-            max_row = sheet.max_row
-            if(sheet["A1"].value==None):
-                max_row = 0
+            channel = client.get_channel(mmlist)
+
             try:
                 print(parameters)
                 if message.author.id==admin_id:
                     user = await client.fetch_user(int(parameters[0]))
                     name=user.name
-                    for idx in range(1,max_row+1):
-                        if sheet["A"+str(idx)].value == str(parameters[0]):
-                            sheet.delete_rows(idx)
+                    async for msg in channel.history(limit=None):
+                        content = msg.content
+                        if content == parameters[0]:
+                            await msg.delete()
                             await message.channel.send(name+"님이 mathcmaker에서 제거되었습니다.")
-                            file.save("mmlist.xlsx")
                             return
 
-                    sheet["A"+str(max_row+1)].value = str(parameters[0])
+                    await channel.send(parameters[0])
                     await message.channel.send(name+"님이 matchmaker에 등록되었습니다.")
-                    file.save("mmlist.xlsx")
                     return
 
                 else:
@@ -67,16 +68,16 @@ async def on_message(message):
                     return
                     
             except:
-                for idx in range(1,max_row+1):
-                    if sheet["A"+str(idx)].value == str(message.author.id):
-                        sheet.delete_rows(idx)
+                async for msg in channel.history(limit=None):
+                    content = msg.content
+                    if content == str(message.author.id):
+                        await msg.delete()
                         await message.channel.send("mathcmaker에서 제거되었습니다.")
-                        file.save("mmlist.xlsx")
                         return
 
-                sheet["A"+str(max_row+1)].value = str(message.author.id)
+                await channel.send(message.author.id)
                 await message.channel.send("matchmaker에 등록되었습니다.")
-                file.save("mmlist.xlsx")
+                return
 
         if cmd == '도움':
             embed=discord.Embed(title="도움말", color=0x602dd9)
@@ -88,77 +89,61 @@ async def on_message(message):
         if cmd == '방':            
         
             if parameters[0] == '삭제':
-                file = openpyxl.load_workbook("room.xlsx")
-                sheet = file.active
-                max_row = sheet.max_row
-
-                if len(parameters)>1 and message.author.id==admin_id:
-                    for idx in range(1,max_row+1):
-                        if sheet["A"+str(idx)].value==parameters[1]:
-                            sheet.delete_rows(idx)
-                            file.save("room.xlsx")
-                            await message.channel.send("방을 성공적으로 지웠습니다")
-                            break
+                channel = client.get_channel(room)
+                        
                 
+                if len(parameters)>1 and message.author.id==admin_id:
+                    async for msg in channel.history(limit=None):
+                        sources=msg.content.split("|")
+                        if sources[0]==parameters[1]:
+                            await msg.delete()
+                            await message.channel.send("방을 성공적으로 지웠습니다.")
+                            return
+                    await message.channel.send("존재하지 않는 방입니다.")
+
                 elif len(parameters)>1:
                     await message.channel.send("권한이 없습니다.")
 
                 else:
-                    for idx in range(1,max_row+1):
-                        if sheet["D"+str(idx)].value==str(message.author.id):
-                            sheet.delete_rows(idx)
-                            await message.channel.send("방을 성공적으로 지웠습니다")
-                            break
-                    file.save("room.xlsx")
+                    async for msg in channel.history(limit=None):
+                        sources=msg.content.split("|")
+                        if sources[3]==str(message.author.id):
+                            await msg.delete()
+                            await message.channel.send("방을 성공적으로 지웠습니다.")
+                            return
+                        await message.channel.send("아직 방을 세우지 않았습니다.")
 
             if parameters[0] == '조회':
-                
-                file = openpyxl.load_workbook("room.xlsx")
-                sheet = file.active
-                max_row = sheet.max_row
-                channel = message.channel
-
-                #print(max_row)
-                if(sheet["A1"].value==None):
-                    max_row = 0
+                channel = client.get_channel(room)
+                isRoom = False
+                cnt=0
                 # sheet[A(n)] = 방장 닉네임
                 # sheet[B(n)] = 코드
                 # sheet[C(n)] = 비밀번호
                 # sheet[D(n)] = user id(식별용)
                 # sheet[E(n)] = user name
+                async for msg in channel.history(limit=None):
+                    isRoom = True
+                    cnt+=1
 
-                if(max_row==0):
-                    await channel.send("방이 없습니다!")
-                for idx in range(1,max_row+1):
-                    
-                    host = sheet["A"+str(idx)].value
-                    code = sheet["B"+str(idx)].value
-                    pw = str(sheet["C"+str(idx)].value)
-                    usr_name=sheet["E"+str(idx)].value
+                    sources=msg.content.split("|")
 
-                    embed=discord.Embed(title="Room No."+str(idx), color=0x602dd9)
+                    host = sources[0]
+                    code = sources[1]
+                    pw = sources[2]
+                    usr_name=sources[4]
+
+                    embed=discord.Embed(title="Room No."+str(cnt), color=0x602dd9)
                     embed.add_field(name="Host", value=host+"("+usr_name+")", inline=False)
-                    embed.add_field(name="Room Code", value=code, inline=True)
+                    embed.add_field(name="Room Code", value=code.upper(), inline=True)
                     embed.add_field(name="Password", value=pw, inline=True)
                       
-                    await channel.send(embed=embed)
-                
-                file.save("room.xlsx")
+                    await message.channel.send(embed=embed)
 
+                if(isRoom is False):
+                    await message.channel.send("방이 없습니다!")
 
             if parameters[0] == '생성':
-                file = openpyxl.load_workbook("room.xlsx")
-                sheet = file.active
-                max_row = sheet.max_row
-                if(sheet["A1"].value==None):
-                    max_row = 0
-                #print(max_row)
-                
-                # sheet[A(n)] = 방장 닉네임
-                # sheet[B(n)] = 코드
-                # sheet[C(n)] = 비밀번호
-                # sheet[D(n)] = user id(식별용)
-                # sheet[E(n)] = user name
 
                 if len(parameters) < 4:
                     embed=discord.Embed(title="도움말")
@@ -187,32 +172,33 @@ async def on_message(message):
                     
                     
                     else:
-                        for idx in range(1,max_row+1):
-                            if sheet["D"+str(idx)].value==str(message.author.id):
-                                sheet.delete_rows(idx)
-                                max_row-=1
+                        # sheet[A(n)] = 방장 닉네임
+                        # sheet[B(n)] = 코드
+                        # sheet[C(n)] = 비밀번호
+                        # sheet[D(n)] = user id(식별용)
+                        # sheet[E(n)] = user name
+
+                        channel = client.get_channel(room)
+                        
+                        async for msg in channel.history(limit=None):
+                            sources=msg.content.split("|")
+                            if sources[0]==parameters[1]:
+                                await msg.delete()
                                 break
+                            if sources[3]==message.author.id:
+                                await msg.delete()
+                                break
+                        content = parameters[1]+"|"+parameters[2]+"|"+parameters[3]+"|"+str(message.author.id)+"|"+message.author.name
+                        await channel.send(content)
 
-                        sheet["A"+str(max_row+1)].value = parameters[1]
-                        sheet["B"+str(max_row+1)].value = parameters[2]
-                        sheet["C"+str(max_row+1)].value = parameters[3]
-                        sheet["D"+str(max_row+1)].value = str(message.author.id)
-                        sheet["E"+str(max_row+1)].value = str(message.author.name)
-
-                        file.save("room.xlsx")
                         await message.channel.send("방 등록이 완료됐습니다")
                         
-                        file = openpyxl.load_workbook("mmlist.xlsx")
-                        sheet = file.active
-                        max_row = sheet.max_row
-                        if(sheet["A1"].value==None):
-                            return
-                        
-                        for idx in range(1,max_row+1):
-                            user = await client.fetch_user(int(sheet["A"+str(idx)].value))
+                        channel = client.get_channel(mmlist)
+                        async for msg in channel.history(limit=None):
+                            user = await client.fetch_user(int(msg.content))
                             await user.create_dm()
-                            channel = user.dm_channel
-                            await channel.send(parameters[1]+"님의 방이 생성되었습니다. -조회")
-                            
-access_token=os.environ["BOT_TOKEN"]
-client.run(access_token)
+                            tmpchannel = user.dm_channel
+                            await tmpchannel.send(parameters[1]+"님의 방이 생성되었습니다. -방 조회")
+
+
+client.run(token)
