@@ -28,6 +28,14 @@ async def on_message(message):
     if message.author == client.user:
         return
 
+    if client.user.mentioned_in(message):
+        channel = client.get_channel(mmlist)
+        async for msg in channel.history(limit=None):
+            user = await client.fetch_user(int(msg.content))
+            await user.create_dm()
+            tmpchannel = user.dm_channel
+            await tmpchannel.send(message.author.name+"님이 "+message.channel.name+"에서 난투를 구하고 있습니다")        
+
     elif message.content.startswith('-'):
 
         cmd = message.content.split()[0].replace("-","")
@@ -79,7 +87,9 @@ async def on_message(message):
             embed=discord.Embed(title="도움말", color=0x602dd9)
             embed.add_field(name="-방 생성", value="방을 생성합니다", inline=True)
             embed.add_field(name="-방 삭제", value="방을 삭제합니다", inline=True)
-            embed.add_field(name="-방 조회", value="현재 있는 방을 나열합니다", inline=True)
+            embed.add_field(name="-방 조회", value="현재 있는 방을 나열합니다.", inline=True)
+            embed.add_field(name="-mm", value="Matchmaker에 등록합니다.", inline=True)
+            embed.add_field(name="@MatchMaker", value="봇을 멘션하면 매치메이커 알림이 갑니다.", inline=True)
             await message.channel.send(embed=embed)
 
         if cmd == '방':            
