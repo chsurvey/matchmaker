@@ -28,7 +28,7 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if client.user.mentioned_in(message):
+    if client.user.mentioned_in(message) and message.content != "@here" and message.content != "@everyone":
         channel = client.get_channel(mmlist)
         async for msg in channel.history(limit=None):
             user = await client.fetch_user(int(msg.content))
