@@ -48,6 +48,18 @@ async def on_message(message):
         #     await user.create_dm()
         #     channel = user.dm_channel
         #     await channel.send("test")
+        if cmd == '대기중':
+            cnt = 0
+            channel = client.get_channel(mmlist)
+            string=""
+            async for msg in channel.history(limit=None):
+                cnt+=1
+                content = msg.content
+                user = await client.fetch_user(int(content))
+                string += str(cnt) + ". " + user.name + "\n"
+                
+            await message.channel.send("mm 대기중인 인원:\n"+string)
+                
         if cmd == 'mm':
             channel = client.get_channel(mmlist)
 
