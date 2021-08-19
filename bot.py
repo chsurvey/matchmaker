@@ -102,6 +102,7 @@ async def on_message(message):
             embed.add_field(name="-방 조회", value="현재 있는 방을 나열합니다.", inline=True)
             embed.add_field(name="-mm", value="Matchmaker에 등록합니다.", inline=True)
             embed.add_field(name="@MatchMaker", value="봇을 멘션하면 매치메이커 알림이 갑니다.", inline=True)
+            embed.add_field(name="-대기중", value="mm에 등록된 사람을 나열합니다.", inline=True)
             await message.channel.send(embed=embed)
 
         if cmd == '방':            
