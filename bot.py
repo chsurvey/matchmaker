@@ -34,6 +34,7 @@ async def on_message(message):
             user = await client.fetch_user(int(msg.content))
             await user.create_dm()
             tmpchannel = user.dm_channel
+            print(user.name, msg.content)
             await tmpchannel.send(message.author.name+"님이 "+message.channel.name+"에서 난투를 구하고 있습니다")        
 
     elif message.content.startswith('-'):
